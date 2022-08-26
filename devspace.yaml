@@ -1,0 +1,45 @@
+version: v2beta1
+name: vscode-demo
+
+# Optional: deploy a simple pod
+deployments:
+  my-app:
+    helm:
+      # If chart: is omitted, component chart will be used
+      values:
+        containers:
+          - image: golang:1.18
+
+# Start development for that pod
+dev:
+  my-app:
+    # Select the pod we just have deployed
+    imageSelector: golang:1.18
+    # Make sure the pod is sleeping
+    command: ["sh", "-c", "tail -f /dev/null"]
+    # Change working dir to /app
+    workingDir: /app
+    # Create ssh connection to container and save my-app.devspace ssh configuration to ~/.ssh/config
+    ssh:
+      localHostname: my-app.devspace
+    # Sync local files into container at /app
+    sync:
+      - path: ./:/app
+      - path: "${DEVSPACE_USER_HOME}/.gitconfig:/root/.gitconfig"
+    # Forward the port to the local machine
+    ports:
+      - port: 9000:9000
+    # Make sure git credentials and devspace are available inside the container
+    proxyCommands:
+      - gitCredentials: true
+      - command: devspace
+    
+
+# Define the flow when what is started
+pipelines:
+  dev: |-
+    # Deploy the application and then start dev
+    run_default_pipeline dev
+
+    # Open VSCode as soon as we are done
+    code --folder-uri vscode-remote://ssh-remote+my-app.devspace/app
