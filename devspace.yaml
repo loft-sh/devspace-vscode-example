@@ -33,7 +33,6 @@ dev:
     proxyCommands:
       - gitCredentials: true
       - command: devspace
-    
 
 # Define the flow when what is started
 pipelines:
