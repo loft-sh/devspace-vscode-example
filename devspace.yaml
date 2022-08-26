@@ -22,14 +22,16 @@ dev:
     # Create ssh connection to container and save my-app.devspace ssh configuration to ~/.ssh/config
     ssh:
       localHostname: my-app.devspace
+    # Forward the port to the local machine
+    ports:
+      - port: 9000:9000
     # Sync local files into container at /app
     sync:
       - path: ./:/app
       - path: "${DEVSPACE_USER_HOME}/.gitconfig:/root/.gitconfig"
-    # Forward the port to the local machine
-    ports:
-      - port: 9000:9000
-    # Make sure git credentials and devspace are available inside the container
+        file: true
+        disableDownload: true
+    # Optional: make sure git credentials and devspace are available inside the container
     proxyCommands:
       - gitCredentials: true
       - command: devspace
